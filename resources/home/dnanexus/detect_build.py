@@ -38,7 +38,8 @@ _KNOWN_CHR1_LENGTHS = {
     GRCH38_CHR1_LENGTH: "GRCH38",
 }
 
-_CONTIG_LINE = re.compile(r"^##contig=<ID=(?P<id>[^,>]+),length=(?P<length>\d+)")
+_CONTIG_LINE = re.compile(r"^##contig=<(?P<attrs>.+)>$")
+_CONTIG_ATTR = re.compile(r"(?P<key>[^,=]+)=(?P<value>[^,]*)")
 
 _REFERENCE_LINE = re.compile(r"^##reference=(?P<value>.+)$")
 
@@ -62,8 +63,13 @@ def _first_autosome_chr1_length(path: Path) -> int | None:
             if not line.startswith("#"):
                 break
             match = _CONTIG_LINE.match(line.rstrip("\n"))
-            if match and match.group("id") in ("chr1", "1"):
-                return int(match.group("length"))
+            if not match:
+                continue
+            attrs = dict(_CONTIG_ATTR.findall(match.group("attrs")))
+            contig_id = attrs.get("ID")
+            length = attrs.get("length")
+            if contig_id in ("chr1", "1") and length is not None and length.isdigit():
+                return int(length)
     return None
 
 
