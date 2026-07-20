@@ -1,0 +1,129 @@
+{
+  "name": "eggd_swap-prep-dna-vcf",
+  "title": "RNA-swap identity QC: prepare DNA germline site list",
+  "summary": "Select germline heterozygous SNVs from a TSO500 DNA VCF, lift over to GRCh38 only if needed, and restrict to the PanCan capture region.",
+  "version": "0.1.0",
+  "dxapi": "1.0.0",
+  "inputSpec": [
+    {
+      "name": "dna_vcf",
+      "label": "TSO500 DNA genome VCF",
+      "help": "Raw *_MergedSmallVariants.genome.vcf (or equivalent) — the full PASS/non-PASS call set, not a curated hotspot/annotated subset. Its own header is inspected to determine genome build; no build is assumed from the filename.",
+      "class": "file",
+      "patterns": ["*.vcf", "*.vcf.gz"],
+      "optional": false
+    },
+    {
+      "name": "reference_fasta",
+      "label": "GRCh38 reference FASTA",
+      "help": "The exact GRCh38 reference used by the matched RNA aligner (e.g. the CTAT reference used by STAR/Eunomia). Used both as the LiftoverVcf target and, when the DNA VCF is already GRCh38, as the contig-length cross-check.",
+      "class": "file",
+      "patterns": ["*.fa", "*.fasta", "*.fa.gz", "*.fasta.gz"],
+      "optional": false
+    },
+    {
+      "name": "reference_fasta_fai",
+      "label": "Reference FASTA index (.fai)",
+      "class": "file",
+      "patterns": ["*.fai"],
+      "optional": false
+    },
+    {
+      "name": "reference_dict",
+      "label": "Reference sequence dictionary (.dict)",
+      "class": "file",
+      "patterns": ["*.dict"],
+      "optional": false
+    },
+    {
+      "name": "chain_file",
+      "label": "hg19->GRCh38 liftover chain",
+      "help": "Only used when dna_vcf is detected as hg19/GRCh37. Still required as an input even for a GRCh38 dna_vcf, since build is not known until the app inspects the VCF header at runtime.",
+      "class": "file",
+      "patterns": ["*.chain", "*.chain.gz"],
+      "optional": false
+    },
+    {
+      "name": "capture_bed",
+      "label": "GRCh38 RNA capture-region BED",
+      "help": "PanCan/TSFP capture manifest already mapped to GRCh38 — no liftover needed on this side.",
+      "class": "file",
+      "patterns": ["*.bed"],
+      "optional": false
+    },
+    {
+      "name": "gatk_jar",
+      "label": "GATK jar (LiftoverVcf)",
+      "help": "Provided directly as a file input rather than resolved through an asset-selection manifest, to keep this app free of any manifest/candidate/validation-mode indirection. The caller is responsible for supplying the correct, fixed GATK build every time.",
+      "class": "file",
+      "patterns": ["*.jar"],
+      "optional": false
+    },
+    {
+      "name": "sample_id",
+      "label": "Sample/specimen identifier (label only)",
+      "help": "Used only to label prepare_qc_json for human readability. Never used for pairing/discovery logic — this app compares nothing and looks up nothing.",
+      "class": "string",
+      "optional": true
+    }
+  ],
+  "outputSpec": [
+    {
+      "name": "site_vcf",
+      "label": "Prepared germline site VCF (GRCh38, capture-restricted)",
+      "class": "file"
+    },
+    {
+      "name": "site_vcf_tbi",
+      "label": "Tabix index for site_vcf",
+      "class": "file"
+    },
+    {
+      "name": "rejected_liftover_vcf",
+      "label": "LiftoverVcf REJECT output",
+      "help": "Header-only (no records) when liftover was skipped because dna_vcf was already GRCh38 — the output contract is always satisfied so downstream tooling never has to special-case a missing file.",
+      "class": "file"
+    },
+    {
+      "name": "prepare_qc_json",
+      "label": "Preparation funnel/QC report",
+      "help": "Detected input genome build and the evidence used to determine it, whether liftover ran, and site counts retained/rejected at each pipeline step.",
+      "class": "file"
+    }
+  ],
+  "runSpec": {
+    "interpreter": "bash",
+    "file": "src/code.sh",
+    "distribution": "Ubuntu",
+    "release": "24.04",
+    "version": "0",
+    "timeoutPolicy": {
+      "*": {
+        "hours": 2
+      }
+    },
+    "executionPolicy": {
+      "restartOn": {
+        "SpotInstanceInterruption": 2
+      }
+    },
+    "execDepends": [
+      {"name": "bcftools"},
+      {"name": "tabix"},
+      {"name": "python3"},
+      {"name": "openjdk-17-jre-headless"}
+    ]
+  },
+  "regionalOptions": {
+    "aws:eu-central-1": {
+      "systemRequirements": {
+        "*": {
+          "instanceType": "mem1_ssd1_v2_x8"
+        }
+      }
+    }
+  },
+  "access": {
+    "network": []
+  }
+}
