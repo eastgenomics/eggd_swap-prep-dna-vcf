@@ -36,8 +36,10 @@ See the design rationale and the reboot this app is part of:
 6. Restrict to the RNA capture region (`bcftools view -R capture_bed`).
 7. `bgzip` + `tabix` the final site VCF.
 
-Every step count is recorded in `prepare_qc_json` (a funnel report), along
-with the Step 0 build-detection evidence.
+Every step count is recorded in `prepare_qc_json` (a funnel report) and
+also echoed as a single summary line to the job log, along with the Step 0
+build-detection evidence — so the funnel is visible without downloading the
+JSON output.
 
 ## Inputs
 
@@ -55,8 +57,16 @@ with the Step 0 build-detection evidence.
 | Output | Class |
 |---|---|
 | `site_vcf` / `site_vcf_tbi` | file |
-| `rejected_liftover_vcf` | file (header-only if liftover was skipped) |
 | `prepare_qc_json` | file |
+
+`LiftoverVcf`'s `--REJECT` output (and its per-contig rejection counts) is
+logged to the job log and summarised as a count in `prepare_qc_json`, not
+persisted as a declared file output — nothing downstream consumes the
+rejected records themselves, and in every real run to date the count has
+been zero. Keeping it as a log line rather than a file avoids the
+header-only-placeholder branch that would otherwise be needed when
+liftover is skipped, and matches how other apps in this project surface
+low-value diagnostic counts.
 
 ## Known limitation, tracked for the `compare` app
 

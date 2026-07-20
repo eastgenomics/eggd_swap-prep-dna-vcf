@@ -1,6 +1,6 @@
 #!/bin/bash
-# eggd_rna_swap_prepare_sites — select germline het SNVs from a TSO500 DNA
-# VCF, lift over to GRCh38 only when the input actually needs it, restrict to
+# eggd_swap-prep-dna-vcf — select germline het SNVs from a TSO500 DNA VCF,
+# lift over to GRCh38 only when the input actually needs it, restrict to
 # the RNA capture region, and report a per-step site-count funnel.
 #
 # Deliberately simple: no asset manifest, no candidate_id, no validation_mode.
@@ -73,6 +73,10 @@ main() {
 
     if [[ "$liftover_required" == "True" ]]; then
         # --- Step 4: liftover hg19 -> GRCh38 --------------------------------
+        # GATK requires --REJECT to point at a real path; its content is not
+        # persisted as a declared output (see rejected_count logging below) —
+        # only the count and GATK's own per-contig log lines, already visible
+        # in the job log, are kept.
         java -XX:MaxRAMPercentage=70.0 -jar "$gatk_jar_path" LiftoverVcf \
             -I "$work_dir/renamed.vcf.gz" \
             -O "$lifted_vcf" \
@@ -81,17 +85,17 @@ main() {
             -R "$reference_fasta_path" \
             --RECOVER_SWAPPED_REF_ALT true \
             --WRITE_ORIGINAL_POSITION true
+        rejected_count="$(bcftools view -H "$rejected_vcf" 2>/dev/null | wc -l || echo 0)"
     else
         # dna_vcf is already GRCh38 (confirmed in Step 0 against the supplied
-        # reference_fasta_fai) — skip GATK LiftoverVcf entirely. rejected_vcf
-        # is still produced, header-only, so the output contract never has a
-        # missing-file special case downstream.
+        # reference_fasta_fai) — skip GATK LiftoverVcf entirely. There is
+        # nothing to reject, so no rejected_vcf is produced at all.
         cp "$work_dir/renamed.vcf.gz" "$lifted_vcf"
-        bcftools view -h "$work_dir/renamed.vcf.gz" -Oz -o "$rejected_vcf"
+        rejected_count=0
     fi
     bcftools index -t "$lifted_vcf" 2>/dev/null || true
     lifted_count="$(bcftools view -H "$lifted_vcf" | wc -l)"
-    rejected_count="$(bcftools view -H "$rejected_vcf" 2>/dev/null | wc -l || echo 0)"
+    echo "LiftoverVcf rejected ${rejected_count} record(s)$( [[ "$liftover_required" == "True" ]] || echo ' (liftover skipped — dna_vcf already GRCh38)' )."
 
     # --- Step 5: exclude MNV-type records (overlapping-record crash fix) ----
     bcftools view -e '(strlen(REF)>1 && strlen(REF)=strlen(ALT))' "$lifted_vcf" -Oz \
@@ -107,6 +111,8 @@ main() {
     final_count="$capture_count"
 
     tabix -p vcf "$work_dir/site.vcf.gz"
+
+    echo "Site funnel: raw=${raw_count} selected(PASS,biallelic,het,DP>=30)=${selected_count} vaf_band=${vafband_count} renamed=${renamed_count} lifted_or_grch38_input=${lifted_count} rejected_by_liftover=${rejected_count} post_mnv_exclusion=${post_mnv_count} capture_region=${capture_count} final=${final_count}"
 
     # --- QC / funnel report ---------------------------------------------------
     local qc_json="$work_dir/prepare_qc.json"
@@ -124,15 +130,13 @@ main() {
         --count "final=${final_count}" \
         >"$qc_json"
 
-    local site_vcf_id site_vcf_tbi_id rejected_vcf_id qc_json_id
+    local site_vcf_id site_vcf_tbi_id qc_json_id
     site_vcf_id="$(dx upload "$work_dir/site.vcf.gz" --brief)"
     site_vcf_tbi_id="$(dx upload "$work_dir/site.vcf.gz.tbi" --brief)"
-    rejected_vcf_id="$(dx upload "$rejected_vcf" --brief)"
     qc_json_id="$(dx upload "$qc_json" --brief)"
 
     dx-jobutil-add-output site_vcf "$site_vcf_id" --class=file
     dx-jobutil-add-output site_vcf_tbi "$site_vcf_tbi_id" --class=file
-    dx-jobutil-add-output rejected_liftover_vcf "$rejected_vcf_id" --class=file
     dx-jobutil-add-output prepare_qc_json "$qc_json_id" --class=file
 }
 

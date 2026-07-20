@@ -79,12 +79,6 @@
       "class": "file"
     },
     {
-      "name": "rejected_liftover_vcf",
-      "label": "LiftoverVcf REJECT output",
-      "help": "Header-only (no records) when liftover was skipped because dna_vcf was already GRCh38 — the output contract is always satisfied so downstream tooling never has to special-case a missing file.",
-      "class": "file"
-    },
-    {
       "name": "prepare_qc_json",
       "label": "Preparation funnel/QC report",
       "help": "Detected input genome build and the evidence used to determine it, whether liftover ran, and site counts retained/rejected at each pipeline step.",
