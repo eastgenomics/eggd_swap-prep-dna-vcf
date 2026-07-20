@@ -96,11 +96,12 @@ true denominator, not the `ASEReadCounter` TSV row count.
 
 | | |
 |---|---|
-| App ID | `app-J9PBQK846y016X701bjjF5Bb` |
-| Name / version | `eggd_swap-prep-dna-vcf` / `0.1.0` |
+| App ID | `app-J9PBZZ04g9qZ3Y4zvXY2Kxp2` |
+| Name / version | `eggd_swap-prep-dna-vcf` / `1.0.0` |
+| Jira story | [DI-3661](https://cuhbioinformatics.atlassian.net/browse/DI-3661) |
 | Billed to | `org-emee_1` |
 | Region | `aws:eu-central-1` |
-| Built from project | `project-J9JJQp04ykb8yj13948BGJ9B` (`003_260718_rna-swap-qc`) |
+| Built from project | `project-J9PBZG04b0g16X701bjjF6VF` (`004_260720_swap_check_apps`) |
 | Developers | `org-emee_1` only |
 | Authorized users | `org-emee_1` only |
 | Published | No — built via `dx build --app --bill-to org-emee_1 .`, not `dx publish` |
@@ -111,3 +112,8 @@ app requirements: app (not applet), `eggd_` prefix, `org-emee_1`-only
 developers/users, Ubuntu 24.04, `aws:eu-central-1`, timeout policy set,
 asset (`htslib_suite_asset`) over apt/manual compilation, `set -eo
 pipefail`.
+
+An earlier `0.1.0` build (`app-J9PBQK846y016X701bjjF5Bb`, built in
+`003_260718_rna-swap-qc`) predates the DI-3661 story and the version bump
+to `1.0.0`; it is superseded by this build and left as-is (unpublished,
+harmless) rather than deleted.

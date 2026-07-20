@@ -2,7 +2,7 @@
   "name": "eggd_swap-prep-dna-vcf",
   "title": "RNA-swap identity QC: prepare DNA germline site list",
   "summary": "Select germline heterozygous SNVs from a TSO500 DNA VCF, lift over to GRCh38 only if needed, and restrict to the PanCan capture region.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "dxapi": "1.0.0",
   "inputSpec": [
     {
