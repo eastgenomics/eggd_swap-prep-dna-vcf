@@ -37,7 +37,10 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         step, _, value = item.partition("=")
         if not value.isdigit():
-            print(f"Malformed --count value (N must be a non-negative integer): {item!r}", file=sys.stderr)
+            print(
+                f"Malformed --count value (N must be a non-negative integer): {item!r}",
+                file=sys.stderr,
+            )
             return 2
         counts[step] = int(value)
 

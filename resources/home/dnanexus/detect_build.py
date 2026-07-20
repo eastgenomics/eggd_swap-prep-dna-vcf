@@ -83,7 +83,9 @@ def _reference_string_signal(value: str | None) -> str:
         return "ABSENT"
     lowered = value.lower()
     matches = {
-        build for build, hints in _BUILD_STRING_HINTS.items() if any(hint in lowered for hint in hints)
+        build
+        for build, hints in _BUILD_STRING_HINTS.items()
+        if any(hint in lowered for hint in hints)
     }
     if len(matches) == 1:
         return matches.pop()
