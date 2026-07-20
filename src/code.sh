@@ -15,10 +15,11 @@ main() {
 
     dx-download-all-inputs --parallel
 
-    local dna_vcf_path="$HOME/in/dna_vcf/$(ls "$HOME/in/dna_vcf")"
-    local chain_path="$HOME/in/chain_file/$(ls "$HOME/in/chain_file")"
-    local capture_bed_path="$HOME/in/capture_bed/$(ls "$HOME/in/capture_bed")"
-    local gatk_jar_path="$HOME/in/gatk_jar/$(ls "$HOME/in/gatk_jar")"
+    local dna_vcf_path chain_path capture_bed_path gatk_jar_path
+    dna_vcf_path="$HOME/in/dna_vcf/$(ls "$HOME/in/dna_vcf")"
+    chain_path="$HOME/in/chain_file/$(ls "$HOME/in/chain_file")"
+    capture_bed_path="$HOME/in/capture_bed/$(ls "$HOME/in/capture_bed")"
+    gatk_jar_path="$HOME/in/gatk_jar/$(ls "$HOME/in/gatk_jar")"
 
     # GATK requires the .fai and .dict to sit next to the .fasta with matching
     # basenames; dx-download-all-inputs keeps each declared input in its own
