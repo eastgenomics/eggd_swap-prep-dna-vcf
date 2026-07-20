@@ -52,6 +52,18 @@ JSON output.
 | `gatk_jar` | file | GATK jar, supplied directly (no asset-selection indirection) |
 | `sample_id` | string, optional | Label only — never used for pairing logic |
 
+`bcftools`/`samtools`/`bgzip`/`tabix` come from the team's formal, **Approved**
+`htslib_suite_asset` v1.22 DNAnexus AssetBundle (`record-J1YBvy049yKpP7kk1j4ggqxZ`,
+approved [DI-2083](https://cuhbioinformatics.atlassian.net/browse/DI-2083)),
+declared under `assetDepends` rather than pulled from apt — not a project-specific
+choice. **Caveat:** the asset itself was built in an Ubuntu 20.04 context, and
+the RNA-swap-specific qualification record for it
+([draft](https://cuhbioinformatics.atlassian.net/wiki/spaces/DV/pages/4751786032))
+states the required Ubuntu 24.04 smoke test has not yet been performed — this
+app runs on Ubuntu 24.04, so that smoke test should be completed (or the
+existing one from the asset's own approval page treated as sufficient
+precedent) before treating this dependency as release-qualified.
+
 ## Outputs
 
 | Output | Class |

@@ -102,10 +102,14 @@
       }
     },
     "execDepends": [
-      {"name": "bcftools"},
-      {"name": "tabix"},
       {"name": "python3"},
       {"name": "openjdk-17-jre-headless"}
+    ],
+    "assetDepends": [
+      {
+        "name": "htslib_suite_asset",
+        "id": "record-J1YBvy049yKpP7kk1j4ggqxZ"
+      }
     ]
   },
   "regionalOptions": {
