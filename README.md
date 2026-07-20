@@ -91,3 +91,23 @@ ASEReadCounter's own `--min-mapping-quality`/`--min-base-quality` thresholds
 get an explicit `totalCount=0` row. The `compare` app's coverage-breadth
 calculation must use this app's site list / `prepare_qc_json` count as the
 true denominator, not the `ASEReadCounter` TSV row count.
+
+## Built (unpublished) on DNAnexus
+
+| | |
+|---|---|
+| App ID | `app-J9PBQK846y016X701bjjF5Bb` |
+| Name / version | `eggd_swap-prep-dna-vcf` / `0.1.0` |
+| Billed to | `org-emee_1` |
+| Region | `aws:eu-central-1` |
+| Built from project | `project-J9JJQp04ykb8yj13948BGJ9B` (`003_260718_rna-swap-qc`) |
+| Developers | `org-emee_1` only |
+| Authorized users | `org-emee_1` only |
+| Published | No — built via `dx build --app --bill-to org-emee_1 .`, not `dx publish` |
+
+Built following the
+[DRAFT Bioinformatics Development Manual v4](https://cuhbioinformatics.atlassian.net/wiki/spaces/DV/pages/4734550017/DRAFT+Bioinformatics+Development+Manual+v4)
+app requirements: app (not applet), `eggd_` prefix, `org-emee_1`-only
+developers/users, Ubuntu 24.04, `aws:eu-central-1`, timeout policy set,
+asset (`htslib_suite_asset`) over apt/manual compilation, `set -eo
+pipefail`.
