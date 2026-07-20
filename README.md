@@ -28,8 +28,8 @@ See the design rationale and the reboot this app is part of:
    `chr`-prefixed; a plain rename, run unconditionally regardless of build).
 4. If (and only if) Step 0 detected hg19/GRCh37: liftover to GRCh38 via GATK
    `LiftoverVcf` (`RECOVER_SWAPPED_REF_ALT true`, `-XX:MaxRAMPercentage=70.0`).
-   If already GRCh38: skip this step; `rejected_liftover_vcf` is still
-   produced but header-only.
+   If already GRCh38: skip this step entirely — no rejected-records file is
+   produced at all in that case, since there is nothing to reject.
 5. Exclude MNV-type records (`strlen(REF)>1 && strlen(REF)==strlen(ALT)`) —
    these can crash `ASEReadCounter` downstream with an overlapping
    `VariantContext` error.
