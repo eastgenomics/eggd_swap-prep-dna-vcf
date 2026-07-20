@@ -117,3 +117,7 @@ An earlier `0.1.0` build (`app-J9PBQK846y016X701bjjF5Bb`, built in
 `003_260718_rna-swap-qc`) predates the DI-3661 story and the version bump
 to `1.0.0`; it is superseded by this build and left as-is (unpublished,
 harmless) rather than deleted.
+
+## Repository
+
+Pushed to [eastgenomics/eggd_swap-prep-dna-vcf](https://github.com/eastgenomics/eggd_swap-prep-dna-vcf), branch `di-3661-swap-prep-dna-vcf-app` → [PR #1](https://github.com/eastgenomics/eggd_swap-prep-dna-vcf/pull/1). `main` was deliberately initialised as an empty root commit before this branch was rebased onto it, so the PR shows the whole app as new content for review.
