@@ -47,14 +47,19 @@ main() {
 
     raw_count="$(bcftools view -H "$dna_vcf_path" | wc -l)"
 
-    # --- Step 1+2: PASS, biallelic SNV, het GT, DP>=30, VAF band 0.35-0.65 --
+    # --- Step 1: PASS, biallelic SNV, het GT, DP>=30 -----------------------
     bcftools view -f PASS -v snps -m2 -M2 "$dna_vcf_path" \
         | bcftools view -i 'GT="het"' -Ou \
-        | bcftools view -i 'FORMAT/DP>=30 && FORMAT/VF>=0.35 && FORMAT/VF<=0.65' -Oz \
-            -o "$work_dir/selected.vcf.gz"
+        | bcftools view -i 'FORMAT/DP>=30' -Oz \
+            -o "$work_dir/selected-pre-vaf.vcf.gz"
+    bcftools index -t "$work_dir/selected-pre-vaf.vcf.gz"
+    selected_count="$(bcftools view -H "$work_dir/selected-pre-vaf.vcf.gz" | wc -l)"
+
+    # --- Step 2: VAF band 0.35-0.65 -----------------------------------------
+    bcftools view -i 'FORMAT/VF>=0.35 && FORMAT/VF<=0.65' "$work_dir/selected-pre-vaf.vcf.gz" -Oz \
+        -o "$work_dir/selected.vcf.gz"
     bcftools index -t "$work_dir/selected.vcf.gz"
-    selected_count="$(bcftools view -H "$work_dir/selected.vcf.gz" | wc -l)"
-    vafband_count="$selected_count"
+    vafband_count="$(bcftools view -H "$work_dir/selected.vcf.gz" | wc -l)"
 
     # --- Step 3: normalise contig naming (idempotent either way) ------------
     # A chr-prefixed source is required by both the liftover chain (hg19 side)
