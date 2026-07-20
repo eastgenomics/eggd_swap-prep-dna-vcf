@@ -111,8 +111,6 @@ main() {
     capture_count="$(bcftools view -H "$work_dir/site.vcf.gz" | wc -l)"
     final_count="$capture_count"
 
-    tabix -p vcf "$work_dir/site.vcf.gz"
-
     echo "Site funnel: raw=${raw_count} selected(PASS,biallelic,het,DP>=30)=${selected_count} vaf_band=${vafband_count} renamed=${renamed_count} lifted_or_grch38_input=${lifted_count} rejected_by_liftover=${rejected_count} post_mnv_exclusion=${post_mnv_count} capture_region=${capture_count} final=${final_count}"
 
     # --- QC / funnel report ---------------------------------------------------
